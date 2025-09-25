@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIvanCo Wordle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="left">
+      <button id="btnHelp" title="Правила">?</button>
+    </div>
+    <div class="center">
+      <button id="btnPrev" title="Предишен ден">‹</button>
+      <div id="dateLabel" class="date-label">—</div>
+      <div id="timerLabel" class="timer-label"></div>
+      <button id="btnNext" title="Следващ ден">›</button>
+    </div>
+    <div class="right">
+      <button id="btnStats" title="Статистика">📊</button>
+      <button id="btnLeaderboard" title="Класация">🏆</button>
+      <button id="btnTheme" title="Смяна на тема">🌓</button>
+      <button id="btnSettings" title="Настройки (nickname)">⚙</button>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="title">AIvanCo Wordle</h1>
+
+    <section id="board" class="board" aria-label="Игрална дъска"></section>
+
+    <section id="keyboard" class="keyboard" aria-label="Екранна клавиатура"></section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Модали -->
+  <dialog id="modalHelp" class="modal">
+    <h2>Как се играе</h2>
+    <p>Познай думата от 6 опита. Всеки опит трябва да е валидна 6-буквена дума. След всеки опит клетките оцветяват колко сте близо:</p>
+    <ul>
+      <li><span class="ex tile correct">П</span> буквата е на правилно място.</li>
+      <li><span class="ex tile present">Е</span> буквата присъства, но на друго място.</li>
+      <li><span class="ex tile absent">А</span> буквата не присъства.</li>
+    </ul>
+    <p>Има нова дума всеки ден. От горната лента можете да отворите предишни дни.</p>
+  </dialog>
+
+  <dialog id="modalStats" class="modal">
+    <h2>Статистика</h2>
+    <div class="stats-grid">
+      <div><div class="num" id="stPlayed">0</div><div class="lbl">Игри</div></div>
+      <div><div class="num" id="stWins">0</div><div class="lbl">Победи</div></div>
+      <div><div class="num" id="stWinRate">0%</div><div class="lbl">Win rate</div></div>
+      <div><div class="num" id="stStreak">0</div><div class="lbl">Streak</div></div>
+      <div><div class="num" id="stAvg">0.0</div><div class="lbl">Средно опити</div></div>
+    </div>
+    <h3>Разпределение по опити</h3>
+    <div id="dist" class="dist"></div>
+    <div class="actions">
+      <button id="btnShareStats" title="Сподели статистиката">Сподели</button>
+    </div>
+  </dialog>
+
+  <dialog id="modalSettings" class="modal">
+    <h2>Настройки</h2>
+    <label>Nickname
+      <input id="nicknameInput" type="text" maxlength="20" placeholder="напр. KiroCoder" />
+    </label>
+    <small>Използва се за глобалната класация (среден брой опити).</small>
+    <div class="actions">
+      <button id="saveNickname">Запази</button>
+    </div>
+  </dialog>
+
+  <dialog id="modalLeaderboard" class="modal modal-wide">
+    <h2>Класация (среден брой опити)</h2>
+    <div id="leaderboardMe" class="me"></div>
+    <table class="table">
+      <thead><tr><th>#</th><th>Име</th><th>Средно</th><th>Игри</th></tr></thead>
+      <tbody id="leaderboardBody"></tbody>
+    </table>
+  </dialog>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

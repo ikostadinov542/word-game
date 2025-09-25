@@ -1,0 +1,36 @@
+{
+  "AIvanCo": {
+    "nickname": "AIvanCo",
+    "solved": 5,
+    "totalAttempts": 17,
+    "avgAttempts": 3.4,
+    "playedDates": {
+      "2025-09-25-A": {
+        "attempts": 2,
+        "solved": true,
+        "slot": "A"
+      },
+      "2025-09-24-B": {
+        "attempts": 3,
+        "solved": true,
+        "slot": "B"
+      },
+      "2025-09-25-B": {
+        "attempts": 3,
+        "solved": true,
+        "slot": "B"
+      },
+      "2025-09-23-A": {
+        "attempts": 3,
+        "solved": true,
+        "slot": "A"
+      },
+      "2025-09-24-A": {
+        "attempts": 6,
+        "solved": true,
+        "slot": "A"
+      }
+    },
+    "lastUpdated": "2025-09-25T10:42:37.858Z"
+  }
+}
