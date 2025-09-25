@@ -51,3 +51,9 @@ npm run dev
 
 ## Лиценз
 MIT
+
+
+git pull origin main --rebase
+git add .
+git commit -m "Update"
+git push origin main

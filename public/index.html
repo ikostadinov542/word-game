@@ -2,7 +2,7 @@
 <html lang="bg">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>AIvanCo Wordle</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,10 +29,11 @@
   </header>
 
   <main>
-    <h1 class="title">AIvanCo Wordle</h1>
-
-    <section id="board" class="board" aria-label="Игрална дъска"></section>
-
+    <div class="game-container">
+      <h1 class="title">AIvanCo Wordle</h1>
+      <section id="board" class="board" aria-label="Игрална дъска"></section>
+    </div>
+    
     <section id="keyboard" class="keyboard" aria-label="Екранна клавиатура"></section>
   </main>
 
