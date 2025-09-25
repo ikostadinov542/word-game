@@ -62,11 +62,12 @@ function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); 
 function winMessage(attempts){
   switch(Number(attempts)){
     case 1: return 'Най-после';
-    case 2: return 'Пак си я решвал на телефона';
-    case 3: return 'От умните си.';
-    case 4: return 'Не си от най-умните';
-    case 5: return 'Далеч си от умните';
-    case 6: return 'Тъп си';
+    case 2: return 'Пак си я решавал на телефона Янчо!';
+    case 3: return 'Яяяяя Гений!';
+    case 4: return 'От умните си.';
+    case 5: return 'Не си от най-умните';
+    case 6: return 'Далеч си от умните';
+    case 7: return 'Тъп си';
     default: return 'Браво!';
   }
 }
@@ -81,10 +82,10 @@ function shareStats(){
   lines.push(`Игри: ${s.played}  Победи: ${s.wins}  Познати %: ${wr}%`);
   lines.push(`Подред: ${s.streak}  Средно опити: ${avg}`);
   lines.push('Разпределение по опити:');
-  for(let i=0;i<6;i++){ lines.push(`${i+1}: ${s.dist[i]}`); }
+  for(let i=0;i<7;i++){ lines.push(`${i+1}: ${s.dist[i]}`); }
   const pidx=currentPeriodIndex();
   const g = loadLocal(storageKeyForPeriod(pidx), null);
-  if(g && g.solved){ lines.push(`Днес: ${winMessage(g.attempts)} (${g.attempts}/6)`); }
+  if(g && g.solved){ lines.push(`Днес: ${winMessage(g.attempts)} (${g.attempts}/7)`); }
   const text = lines.join('\n');
   if(navigator.share){ navigator.share({ text }).catch(()=>copyText(text)); }
   else { copyText(text); }
@@ -185,7 +186,7 @@ function statsKey(){ return 'sw_stats_v1'; }
 function nickKey(){ return 'sw_nickname'; }
 
 function getStats(){
-  return loadLocal(statsKey(), { played:0, wins:0, streak:0, lastWin:null, dist:[0,0,0,0,0,0] });
+  return loadLocal(statsKey(), { played:0, wins:0, streak:0, lastWin:null, dist:[0,0,0,0,0,0,0] });
 }
 function setStats(s){ saveLocal(statsKey(), s); }
 
@@ -261,7 +262,7 @@ function updateDateLabelForPeriod(idx){
 
 function buildBoard(){
   boardEl.innerHTML='';
-  for(let r=0;r<6;r++){
+  for(let r=0;r<7;r++){
     for(let c=0;c<6;c++){
       const div=document.createElement('div');
       div.className='tile';
@@ -310,7 +311,7 @@ function redraw(){
     }
   }
   // Текущ ред (в процес на въвеждане)
-  if(currentRow<6){
+  if(currentRow<7){
     const g=guesses[currentRow]||'';
     for(let c=0;c<6;c++){
       const idx=currentRow*6+c; const t=allTiles[idx];
@@ -327,7 +328,7 @@ function isValidWord(w){ return WORDS && WORDS.wordsSet.has(w); }
 
 function pushLetter(ch){
   if(gameOver) return;
-  if(currentRow>=6) return;
+  if(currentRow>=7) return;
   if(currentCol<6){
     const cur=guesses[currentRow]||'';
     guesses[currentRow]=(cur+ch).slice(0,6);
@@ -338,7 +339,7 @@ function pushLetter(ch){
 
 function popLetter(){
   if(gameOver) return;
-  if(currentRow>=6) return;
+  if(currentRow>=7) return;
   if(currentCol>0){
     const cur=guesses[currentRow]||'';
     guesses[currentRow]=cur.slice(0,currentCol-1);
@@ -349,7 +350,7 @@ function popLetter(){
 
 function submitRow(){
   if(gameOver) return;
-  if(currentRow>=6) return;
+  if(currentRow>=7) return;
   const cur=norm(guesses[currentRow]||'');
   if(cur.length!==6){ showToast('Думата трябва да е от 6 букви'); return; }
   if(!isValidWord(cur)){
@@ -380,13 +381,14 @@ function submitRow(){
 
   if(won){
     finishWin(game.attempts, iso);
-  } else if(currentRow>=6){
+  } else if(currentRow>=7){
     finishLoss();
   }
 }
 
 function finishWin(attempts, iso){
   showToast(winMessage(attempts));
+  showCelebration(); // Показваме заря ефект
   updateStats(true, attempts, iso);
   gameOver = true;
   // изпращане към класация
@@ -402,7 +404,7 @@ function finishWin(attempts, iso){
 }
 
 function finishLoss(){
-  showToast('Да беше опитал на телефона....');
+  showToast(`Да беше опитал на телефона.... Думата беше: ${solution}`);
   updateStats(false, null, periodDateISOFromIndex(currentPeriodIndex()));
   gameOver = true;
 }
@@ -414,7 +416,7 @@ function updateStats(won, attempts, iso){
     s.wins++;
     s.streak = (s.lastWin===iso? s.streak : (s.lastWin && nextISO(s.lastWin)===iso ? s.streak+1 : 1));
     s.lastWin = iso;
-    if(attempts>=1 && attempts<=6){ s.dist[attempts-1]++; }
+    if(attempts>=1 && attempts<=7){ s.dist[attempts-1]++; }
   } else {
     s.streak = 0;
   }
@@ -437,7 +439,7 @@ function updateStatsUI(){
   // разпределение
   distEl.innerHTML='';
   const max = Math.max(1, ...s.dist);
-  for(let i=0;i<6;i++){
+  for(let i=0;i<7;i++){
     const row=document.createElement('div'); row.className='bar';
     const label=document.createElement('div'); label.className='label'; label.textContent=String(i+1);
     const meter=document.createElement('div'); meter.className='meter'; meter.style.width='100%';
@@ -672,6 +674,61 @@ async function openLeaderboard(){
 
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[c]));
+}
+
+// Заря ефект при победа - 10 секунди с много повече ефекти
+function showCelebration(){
+  const overlay = document.getElementById('celebrationOverlay');
+  if(!overlay) return;
+  
+  overlay.innerHTML = ''; // изчистваме предишни ефекти
+  overlay.classList.add('show');
+  
+  const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#FF69B4', '#00CED1', '#32CD32', '#FF4500', '#9370DB', '#20B2AA'];
+  
+  // Функция за създаване на фойерверк
+  function createFirework(delay = 0) {
+    setTimeout(() => {
+      const firework = document.createElement('div');
+      firework.className = 'firework';
+      firework.style.left = (20 + Math.random() * 60) + '%'; // По-централизирани позиции
+      firework.style.top = (20 + Math.random() * 60) + '%';
+      firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      overlay.appendChild(firework);
+      
+      // Добавяме повече искри около фойерверка (12 вместо 8)
+      for(let j = 0; j < 12; j++){
+        const spark = document.createElement('div');
+        spark.className = 'spark';
+        spark.style.left = firework.style.left;
+        spark.style.top = firework.style.top;
+        spark.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        const angle = (j / 12) * 2 * Math.PI;
+        const distance = 60 + Math.random() * 80; // По-големи искри
+        spark.style.setProperty('--dx', Math.cos(angle) * distance + 'px');
+        spark.style.setProperty('--dy', Math.sin(angle) * distance + 'px');
+        
+        overlay.appendChild(spark);
+      }
+    }, delay);
+  }
+  
+  // Създаваме 50 фойерверка в продължение на 8 секунди
+  for(let i = 0; i < 50; i++){
+    createFirework(i * 160); // Всеки 160ms
+  }
+  
+  // Добавяме още фойерверки в последните 2 секунди за финал
+  for(let i = 0; i < 20; i++){
+    createFirework(8000 + i * 100); // Финални фойерверки всеки 100ms
+  }
+  
+  // Скриваме ефекта след 10 секунди
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.innerHTML = '', 500);
+  }, 10000);
 }
 
 // Старт
