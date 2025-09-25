@@ -233,6 +233,26 @@ function paintKeyboardFromState(){
   });
 }
 
+function updateEnterButtonState(){
+  const enterBtn = document.querySelector('.key[data-key="ENTER"]');
+  if(!enterBtn) return;
+  
+  const currentWord = norm(guesses[currentRow] || '');
+  const isComplete = currentWord.length === 6;
+  const isValid = isComplete && isValidWord(currentWord);
+  
+  // Премахваме предишни класове
+  enterBtn.classList.remove('valid-word', 'invalid-word');
+  
+  if(isComplete){
+    if(isValid){
+      enterBtn.classList.add('valid-word');
+    } else {
+      enterBtn.classList.add('invalid-word');
+    }
+  }
+}
+
 function updateDateLabelForPeriod(idx){
   const start = periodStartFromIndex(idx);
   dateLabel.textContent = formatBGDate(start);
@@ -298,6 +318,9 @@ function redraw(){
       if(ch){ t.textContent=ch; t.classList.add('filled'); }
     }
   }
+  
+  // Актуализираме състоянието на ENTER бутона
+  updateEnterButtonState();
 }
 
 function isValidWord(w){ return WORDS && WORDS.wordsSet.has(w); }
@@ -477,8 +500,41 @@ async function loadWords(){
 
 function pickSolutionForPeriodIndex(pidx){
   const n = WORDS.list.length;
-  const i = ((pidx % n) + n) % n;
-  return WORDS.list[i];
+  
+  // Използваме псевдослучаен генератор с периодовия индекс като seed
+  // за да гарантираме, че всички играчи имат същата дума за даден период
+  function seededRandom(seed) {
+    // Linear congruential generator (LCG) за псевдослучайни числа
+    const a = 1664525;
+    const c = 1013904223;
+    const m = Math.pow(2, 32);
+    return ((a * seed + c) % m) / m;
+  }
+  
+  // Създаваме детерминистично разбъркан списък с думи
+  // Всички играчи ще имат същия разбъркан списък
+  function shuffleArrayWithSeed(array, seed) {
+    const shuffled = [...array];
+    let currentSeed = seed;
+    
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      currentSeed = (currentSeed * 1103515245 + 12345) % Math.pow(2, 31);
+      const j = Math.floor((currentSeed / Math.pow(2, 31)) * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    
+    return shuffled;
+  }
+  
+  // Използваме константен seed за разбъркване, за да всички играчи имат същия ред
+  const shuffleSeed = 42; // константа за всички играчи
+  const shuffledWords = shuffleArrayWithSeed(WORDS.list, shuffleSeed);
+  
+  // Сега избираме дума по цикличен принцип от разбърканият списък
+  // Това гарантира, че няма да има повторения докато не минат всички думи
+  const i = pidx % n;
+  
+  return shuffledWords[i];
 }
 
 function loadSavedGameByPeriod(idx){
@@ -505,6 +561,7 @@ function restoreFromSaved(pidx){
   }
   buildBoard();
   redraw();
+  updateEnterButtonState(); // актуализираме състоянието на ENTER бутона
 }
 
 async function changePeriod(delta){

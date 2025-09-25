@@ -139,6 +139,18 @@ main{width:100%;max-width:768px;padding:10px 16px;display:flex;flex-direction:co
 .key.present{background:var(--present)}
 .key.absent{background:#3b3f44;color:#fff}
 
+/* Стилове за ENTER бутона според валидността на думата */
+.key.valid-word{
+  background:var(--correct) !important;
+  color:#fff !important;
+  box-shadow:0 0 8px rgba(107, 168, 101, 0.5);
+}
+
+.key.invalid-word{
+  background:#787c7e !important;
+  color:#fff !important;
+}
+
 [data-theme="light"] .key.absent{background:#94a3b8;color:#fff}
 
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#22262d;color:#fff;padding:10px 14px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .2s}
